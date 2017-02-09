@@ -282,7 +282,19 @@ static NSString * SID_S;
     NSLog(@"iOS signaling to connectionId %@", [command.arguments objectAtIndex:2]);
     OTConnection* c = [connectionDictionary objectForKey: [command.arguments objectAtIndex:2]];
     NSLog(@"iOS signaling to connection %@", c);
-    [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:nil];
+    [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:&error];
+		    
+    if (error) {
+        NSLog(@"Session.signal failed: %@", [error localizedDescription]);
+    }
+    else {
+        NSLog(@"Session.signal done");
+    }
+   
+    CDVPluginResult* pluginResult = error ?
+    [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]] :
+    [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 
